@@ -161,5 +161,4 @@ fabric.properties
 
 *.img
 *.elf
-*.psf
 src/.idea
