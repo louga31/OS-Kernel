@@ -50,3 +50,5 @@ public:
     void Print(const char* str, unsigned int color = Colors::WHITE);
     void Println(const char* str, unsigned int color = Colors::WHITE);
 };
+
+extern BasicRenderer Renderer;

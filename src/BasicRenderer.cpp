@@ -1,7 +1,9 @@
 #include "BasicRenderer.h"
 
+BasicRenderer Renderer;
+
 void BasicRenderer::PutChar(char chr, unsigned int xOff, unsigned int yOff, unsigned int color) {
-    unsigned int* pixPtr = (unsigned int*)framebuffer->BaseAddress;
+    auto* pixPtr = (unsigned int*)framebuffer->BaseAddress;
     char* fontPtr = (char*)psf1_font->glyphBuffer + (chr * psf1_font->psf1_Header->charsize);
 
     for (unsigned long y = yOff; y < yOff + 16; y++)

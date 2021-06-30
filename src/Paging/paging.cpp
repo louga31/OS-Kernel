@@ -11,10 +11,10 @@ bool PageDirectoryEntry::GetFlag(PT_Flag flag) {
 	return value & bitSelector;
 }
 void PageDirectoryEntry::SetAddress(uint64_t address) {
-	address &= 0x000000ffffffffff;
-	value &= 0xfff0000000000fff;
+	address &= 0x000000FFFFFFFFFF;
+	value &= 0xFFF0000000000FFF;
 	value |= (address << 12);
 }
 uint64_t PageDirectoryEntry::GetAddress() {
-	return (value & 0x000ffffffffff000) >> 12;
+	return (value & 0x000FFFFFFFFFF000) >> 12;
 }

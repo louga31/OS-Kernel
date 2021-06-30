@@ -3,4 +3,4 @@
 #include <stddef.h>
 #include <stdint.h>
 
-typedef unsigned char byte;
+typedef uint8_t byte;

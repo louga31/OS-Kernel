@@ -5,6 +5,7 @@
 #include "efiMemory.h"
 #include "BasicRenderer.h"
 #include "Paging/PageTableManager.h"
+#include "interrupts/IDT.h"
 
 struct BootInfo {
 	Framebuffer* framebuffer;
@@ -19,9 +20,9 @@ extern uint64_t _KernelEnd; // NOLINT(bugprone-reserved-identifier)
 
 struct KernelInfos {
 	PageTableManager* pageTableManager;
-	BasicRenderer* renderer;
 };
 
-void PrepareMemory(BootInfo* bootInfo);
-void CreateRenderer(BootInfo* bootInfo, KernelInfos* kernelInfos);
+void PrepareMemory(BootInfo* bootInfo, KernelInfos* kernelInfos);
+void CreateRenderer(BootInfo* bootInfo);
+void PrepareInterrupts();
 KernelInfos InitializeKernel(BootInfo* bootInfo);

@@ -2,11 +2,11 @@
 
 PageMapIndexer::PageMapIndexer(uint64_t virtualAddress) {
 	virtualAddress >>= 12;
-	P_i = virtualAddress & 0x1ff;
+	P_i = virtualAddress & 0x1FF;
 	virtualAddress >>= 9;
-	PT_i = virtualAddress & 0x1ff;
+	PT_i = virtualAddress & 0x1FF;
 	virtualAddress >>= 9;
-	PD_i = virtualAddress & 0x1ff;
+	PD_i = virtualAddress & 0x1FF;
 	virtualAddress >>= 9;
-	PDP_i = virtualAddress & 0x1ff;
+	PDP_i = virtualAddress & 0x1FF;
 }

@@ -26,4 +26,4 @@ add_executable(src
         memutils.cpp
         memutils.h
         SimpleFont.h
-        types.h Paging/PageTableManager.cpp Paging/PageTableManager.h Paging/paging.cpp kernelutils.h kernelutils.cpp GDT/GDT.cpp GDT/GDT.h)
+        types.h Paging/PageTableManager.cpp Paging/PageTableManager.h Paging/paging.cpp kernelutils.h kernelutils.cpp GDT/GDT.cpp GDT/GDT.h interrupts/IDT.cpp interrupts/IDT.h interrupts/interrupts.cpp interrupts/interrupts.h)
