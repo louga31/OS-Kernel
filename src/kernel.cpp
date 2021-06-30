@@ -21,8 +21,5 @@ extern "C" [[noreturn]] void _start(BootInfo* bootInfo) {
 	Renderer.Print(to_string(PageFrameAllocator::GetReservedRAM() / 1024), Colors::MAGENTA);
 	Renderer.Print(" KB\n", Colors::MAGENTA);
 
-	int* test = (int*)0x80000000000;
-	*test = 2;
-
 	while(true);
 }

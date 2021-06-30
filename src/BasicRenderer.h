@@ -35,10 +35,13 @@ inline unsigned int GetRainbowColor(unsigned int i) {
     }
 }
 
+static uint32_t ClearColor = Colors::BLACK;
+
 class BasicRenderer
 {
 private:
     Point CursorPosition;
+    Point CursorLimits;
     Framebuffer* framebuffer;
     PSF1_FONT* psf1_font;
 
@@ -46,9 +49,19 @@ public:
 	BasicRenderer() {}; // Do not use
     BasicRenderer(Framebuffer* framebuffer, PSF1_FONT* psf1_font) : framebuffer(framebuffer), psf1_font(psf1_font) {};
 
-    void PutChar(char chr, unsigned int xOff, unsigned int yOff, unsigned int color);
-    void Print(const char* str, unsigned int color = Colors::WHITE);
-    void Println(const char* str, unsigned int color = Colors::WHITE);
+    void SetCursorPosition(uint32_t x, uint32_t y);
+    void SetCursorLimits(uint32_t x, uint32_t y);
+
+    void PutPx(uint32_t x, uint32_t y, uint32_t color);
+
+    void PutChar(char chr, uint32_t color = Colors::WHITE, bool haveBackground = false);
+    void PutChar(char chr, uint32_t xOff, uint32_t yOff, uint32_t color = Colors::WHITE, bool haveBackground = false);
+    void ClearChar(uint32_t color = ClearColor);
+
+    void Print(const char* str, uint32_t color = Colors::WHITE, bool haveBackground = false);
+    void Println(const char* str, uint32_t color = Colors::WHITE, bool haveBackground = false);
+
+    void Clear(uint32_t color = ClearColor);
 };
 
 extern BasicRenderer Renderer;
