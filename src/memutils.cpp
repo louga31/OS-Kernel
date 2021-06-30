@@ -8,7 +8,7 @@ size_t GetMemorySize(EFI_MEMORY_DESCRIPTOR* mMap, size_t mMapEntries, size_t mMa
 	for (size_t i = 0; i < mMapEntries; i++)
 	{
 		EFI_MEMORY_DESCRIPTOR* desc = (EFI_MEMORY_DESCRIPTOR*)((size_t)mMap + (i * mMapDescriptorSize));
-		memorySizeBytes += desc->numberOfPages * 4096;
+		memorySizeBytes += desc->numberOfPages * 0x1000;
 	}
 	
 	return memorySizeBytes;
@@ -26,4 +26,10 @@ int memcmp(const void* aptr, const void* bptr, size_t n) {
 			return 1;
 	}
 	return 0;
+}
+
+void memset(void* start, uint8_t value, size_t num) {
+	for (size_t i = 0; i < num; ++i) {
+		*(uint8_t*)((uint64_t)start + i) = value;
+	}
 }

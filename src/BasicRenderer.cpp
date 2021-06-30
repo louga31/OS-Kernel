@@ -11,7 +11,7 @@ void BasicRenderer::PutChar(char chr, unsigned int xOff, unsigned int yOff, unsi
             if ((*fontPtr & (0b10000000 >> (x - xOff))) > 0)
                 *(unsigned int*)(pixPtr + x + (y * framebuffer->PixelsPerScanLine)) = color;
             else
-                *(unsigned int*)(pixPtr + x + (y * framebuffer->PixelsPerScanLine)) = BLACK;
+                *(unsigned int*)(pixPtr + x + (y * framebuffer->PixelsPerScanLine)) = Colors::BLACK;
         }
         fontPtr++;
     }
@@ -38,4 +38,9 @@ void BasicRenderer::Print(const char* str, unsigned int color) {
         
         chr++;
     }
+}
+
+void BasicRenderer::Println(const char* str, unsigned int color) {
+    Print(str, color);
+    Print("\n");
 }
