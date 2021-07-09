@@ -13,7 +13,6 @@ size_t GetMemorySize(EFI_MEMORY_DESCRIPTOR* mMap, size_t mMapEntries, size_t mMa
 	
 	return memorySizeBytes;
 }
-
 int memcmp(const void* aptr, const void* bptr, size_t n) {
 	const byte* a = (byte*)aptr;
 	const byte* b = (byte*)bptr;
@@ -27,7 +26,14 @@ int memcmp(const void* aptr, const void* bptr, size_t n) {
 	}
 	return 0;
 }
-
+extern "C" void* memcpy(void *dest, const void *src, size_t n) {
+	const auto *srcptr = (const byte*)src;
+	auto *destptr = (byte*)dest;
+	for (size_t i = 0; i < n; i++) {
+		destptr[i] = srcptr[i];
+	}
+	return dest;
+}
 void memset(void* start, uint8_t value, size_t num) {
 	for (size_t i = 0; i < num; ++i) {
 		*(uint8_t*)((uint64_t)start + i) = value;

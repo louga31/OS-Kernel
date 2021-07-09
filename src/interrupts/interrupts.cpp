@@ -2,23 +2,29 @@
 #include "../panic.h"
 #include "../IO.h"
 #include "../userinput/keyboard.h"
+#include "../userinput/mouse.h"
 
-__attribute__((interrupt)) void PageFault_Handler(struct interrupt_frame* frame) {
+__attribute__((interrupt)) void PageFault_Handler(interrupt_frame* frame) {
 	Panic("Page fault Detected");
 	while (true);
 }
-__attribute__((interrupt)) void DoubleFault_Handler(struct interrupt_frame* frame) {
+__attribute__((interrupt)) void DoubleFault_Handler(interrupt_frame* frame) {
 	Panic("Double fault Detected");
 	while (true);
 }
-__attribute__((interrupt)) void GeneralProtectionFault_Handler(struct interrupt_frame* frame) {
+__attribute__((interrupt)) void GeneralProtectionFault_Handler(interrupt_frame* frame) {
 	Panic("General Protection fault Detected");
 	while (true);
 }
-__attribute__((interrupt)) void KeyboardInt_Handler(struct interrupt_frame* frame) {
+__attribute__((interrupt)) void KeyboardInt_Handler(interrupt_frame* frame) {
 	uint8_t scancode = inb(0x60);
 	HandleKeyboard(scancode);
 	PIC_EndMaster();
+}
+__attribute__((interrupt)) void MouseInt_Handler(struct interrupt_frame* frame) {
+	uint8_t data = inb(0x60);
+	HandlePS2Mouse(data);
+	PIC_EndSlave();
 }
 void PIC_EndMaster() {
 	outb(PIC1_COMMAND, PIC_EOI);

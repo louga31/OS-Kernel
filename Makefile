@@ -7,13 +7,13 @@ GNUEFI = ../gnu-efi
 OVMFDIR = ../OVMFbin
 LDS = kernel.ld
 MAKE = make
-CC = gcc
+CC = clang++
 ASMC = nasm
-LD = ld
+LD = ld.lld
 EMU=qemu-system-x86_64
 DEBUG=gdb
 
-CFLAGS = -ffreestanding -fshort-wchar -g -std=c++17 -MD
+CFLAGS = -ffreestanding -fshort-wchar -g -std=c++17 -MD -mno-red-zone
 ASMFLAGS =
 LDFLAGS = -T $(LDS) -static -Bsymbolic -nostdlib
 
@@ -41,11 +41,6 @@ kernel: $(OBJS) link
 
 bootloader:
 	cd $(GNUEFI) && $(MAKE) bootloader
-
-$(OBJDIR)/interrupts/interrupts.o: $(SRCDIR)/interrupts/interrupts.cpp
-	@echo !==== COMPILING $^
-	@mkdir -p $(@D)
-	@$(CC) -mno-red-zone -mgeneral-regs-only -ffreestanding -c $^ -o $@
 
 $(OBJDIR)/%.o: $(SRCDIR)/%.cpp
 	@echo !==== COMPILING $<

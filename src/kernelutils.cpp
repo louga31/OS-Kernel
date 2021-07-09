@@ -3,8 +3,9 @@
 #include "GDT/GDT.h"
 #include "Paging/PageFrameAllocator.h"
 #include "interrupts/interrupts.h"
+#include "userinput/mouse.h"
 
-PageTableManager pageTableManager; // TODO: Malloc this when possible
+PageTableManager pageTableManager;
 void PrepareMemory(BootInfo* bootInfo, KernelInfos* kernelInfos) {
 	// Initialize the PageFrameAllocator
 	uint64_t mMapEntries = bootInfo->mMapSize / bootInfo->mMapDescriptorSize;
@@ -37,40 +38,28 @@ void CreateRenderer(BootInfo* bootInfo) {
 	// Create the text renderer
 	Renderer = BasicRenderer(bootInfo->framebuffer, bootInfo->psf1_font);
 }
-IDTR idtr; // TODO: Malloc this when possible
+IDTR idtr;
+void SetIDTGate(void* handler, uint8_t entryOffset, uint8_t type_attr, uint8_t selector) {
+	auto* interrupt = (IDTDescEntry*)(idtr.offset + entryOffset * sizeof(IDTDescEntry));
+	interrupt->SetOffset((uint64_t)handler);
+	interrupt->type_attr = type_attr;
+	interrupt->selector = selector;
+}
 void PrepareInterrupts() {
 	idtr.limit = 0x0FFF;
 	idtr.offset = (uint64_t)PageFrameAllocator::RequestPage();
 
-	auto* int_PageFault = (IDTDescEntry*)(idtr.offset + 0xE * sizeof(IDTDescEntry));
-	int_PageFault->SetOffset((uint64_t)PageFault_Handler);
-	int_PageFault->type_attr = IDT_TA_InterruptGate;
-	int_PageFault->selector = 0x08;
-
-	auto* int_DoubleFault = (IDTDescEntry*)(idtr.offset + 0x8 * sizeof(IDTDescEntry));
-	int_DoubleFault->SetOffset((uint64_t)DoubleFault_Handler);
-	int_DoubleFault->type_attr = IDT_TA_InterruptGate;
-	int_DoubleFault->selector = 0x08;
-
-	auto* int_GeneralProtectionFault = (IDTDescEntry*)(idtr.offset + 0xD * sizeof(IDTDescEntry));
-	int_GeneralProtectionFault->SetOffset((uint64_t)GeneralProtectionFault_Handler);
-	int_GeneralProtectionFault->type_attr = IDT_TA_InterruptGate;
-	int_GeneralProtectionFault->selector = 0x08;
-
-	auto* int_Keyboard = (IDTDescEntry*)(idtr.offset + 0x21 * sizeof(IDTDescEntry));
-	int_Keyboard->SetOffset((uint64_t)KeyboardInt_Handler);
-	int_Keyboard->type_attr = IDT_TA_InterruptGate;
-	int_Keyboard->selector = 0x08;
+	SetIDTGate((void*)PageFault_Handler, 0xE, IDT_TA_InterruptGate, 0x08);
+	SetIDTGate((void*)DoubleFault_Handler, 0x8, IDT_TA_InterruptGate, 0x08);
+	SetIDTGate((void*)GeneralProtectionFault_Handler, 0xD, IDT_TA_InterruptGate, 0x08);
+	SetIDTGate((void*)KeyboardInt_Handler, 0x21, IDT_TA_InterruptGate, 0x08);
+	SetIDTGate((void*)MouseInt_Handler, 0x2C, IDT_TA_InterruptGate, 0x08);
 
 	asm("lidt %0" : : "m" (idtr));
 
 	RemapPIC();
-
-	outb(PIC1_DATA, 0b11111101);
-	outb(PIC2_DATA, 0b11111111);
-	asm ("sti");
 }
-KernelInfos InitializeKernel(BootInfo* bootInfo) { // TODO: Malloc KernelInfos when possible
+KernelInfos InitializeKernel(BootInfo* bootInfo) {
 	GDTDescriptor gdtDescriptor; // NOLINT(cppcoreguidelines-pro-type-member-init)
 	gdtDescriptor.Size = sizeof(GDT) - 1;
 	gdtDescriptor.Offset = (uint64_t)&DefaultGDT;
@@ -81,6 +70,12 @@ KernelInfos InitializeKernel(BootInfo* bootInfo) { // TODO: Malloc KernelInfos w
 	CreateRenderer(bootInfo);
 
 	PrepareInterrupts();
+
+	InitPS2Mouse();
+
+	outb(PIC1_DATA, 0b11111001);
+	outb(PIC2_DATA, 0b11101111);
+	asm ("sti"); // Re-enable the interrupts
 
 	Renderer.Clear(); // Clear Screen
 	return kernelInfos;

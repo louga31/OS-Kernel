@@ -2,6 +2,9 @@
 
 BasicRenderer Renderer;
 
+uint32_t ClearColor = Colors::BLACK;
+uint32_t PrintColor = Colors::WHITE;
+
 void BasicRenderer::SetCursorPosition(uint32_t x, uint32_t y) {
 	CursorPosition.x = x;
 	CursorPosition.y = y;
@@ -11,8 +14,10 @@ void BasicRenderer::SetCursorLimits(uint32_t x, uint32_t y) {
 	CursorLimits.y = y;
 }
 void BasicRenderer::PutPx(uint32_t x, uint32_t y, uint32_t color) {
-	auto* pixPtr = (unsigned int*)framebuffer->BaseAddress;
-	*(unsigned int*)(pixPtr + x + (y * framebuffer->PixelsPerScanLine)) = color;
+	*(uint32_t*)((uint32_t*)framebuffer->BaseAddress + x + (y * framebuffer->PixelsPerScanLine)) = color;
+}
+uint32_t BasicRenderer::GetPx(uint32_t x, uint32_t y) {
+	return *(uint32_t*)((uint32_t*)framebuffer->BaseAddress + x + (y * framebuffer->PixelsPerScanLine));
 }
 void BasicRenderer::PutChar(char chr, uint32_t color, bool haveBackground) {
 	PutChar(chr, CursorPosition.x, CursorPosition.y);
@@ -100,6 +105,50 @@ void BasicRenderer::Clear(uint32_t color) {
 		uint64_t pixPrtBase = fbBase + (bytesPerScanLine * vertical);
 		for (uint32_t* pixPtr = (uint32_t*)pixPrtBase; pixPtr < (uint32_t*)(pixPrtBase + bytesPerScanLine); ++pixPtr) {
 			*pixPtr = color;
+		}
+	}
+	CursorPosition.x = 0;
+	CursorPosition.y = 0;
+}
+void BasicRenderer::ClearMouseCursor(Point64 position) {
+	int xMax = 16;
+	int yMax = 16;
+	int differenceX = dimensions.x - position.x;
+	int differenceY = dimensions.y - position.y;
+
+	if (differenceX < 16) xMax = differenceX;
+	if (differenceY < 16) yMax = differenceY;
+
+	for (uint32_t y = 0; y < yMax; ++y) {
+		for (uint32_t x = 0; x < xMax; ++x) {
+			uint8_t bit = x + y * CURSOR_HEIGHT;
+			uint8_t byte = bit / 8;
+			if ((cursor[byte] & (0b10000000) >> (x % 8))) {
+				if (GetPx(position.x +x, position.y + y) == MouseCursorBufferAfter[x + y * CURSOR_HEIGHT]) {
+					PutPx(position.x + x, position.y + y, MouseCursorBuffer[x + y * CURSOR_HEIGHT]);
+				}
+			}
+		}
+	}
+}
+void BasicRenderer::DrawOverlayMouseCursor(Point64 position, uint32_t color) {
+	int xMax = 16;
+	int yMax = 16;
+	int differenceX = dimensions.x - position.x;
+	int differenceY = dimensions.y - position.y;
+
+	if (differenceX < 16) xMax = differenceX;
+	if (differenceY < 16) yMax = differenceY;
+
+	for (uint32_t y = 0; y < yMax; ++y) {
+		for (uint32_t x = 0; x < xMax; ++x) {
+			uint8_t bit = x + y * CURSOR_HEIGHT;
+			uint8_t byte = bit / 8;
+			if ((cursor[byte] & (0b10000000) >> (x % 8))) {
+				MouseCursorBuffer[x + y * CURSOR_HEIGHT] = GetPx(position.x + x, position.y + y);
+				PutPx(position.x + x, position.y + y, color);
+				MouseCursorBufferAfter[x + y * CURSOR_HEIGHT] = GetPx(position.x + x, position.y + y);
+			}
 		}
 	}
 }
