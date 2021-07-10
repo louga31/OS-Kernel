@@ -3,10 +3,10 @@
 uint64_t freeMemory;
 uint64_t reservedMemory;
 uint64_t usedMemory;
-bool Initialized = false;
 uint64_t pageBitmapIndex = 0;
 
 void PageFrameAllocator::ReadEFIMemoryMap(EFI_MEMORY_DESCRIPTOR* mMap, size_t mMapSize, size_t mMapDescriptorSize) {
+	static bool Initialized = false;
 	if (Initialized)
 		return;
 	Initialized = true;
@@ -32,14 +32,16 @@ void PageFrameAllocator::ReadEFIMemoryMap(EFI_MEMORY_DESCRIPTOR* mMap, size_t mM
 
 	InitBitmap(bitmapSize, largestFreeMemSeg);
 
-	LockPages(PageBitmap.Buffer, PageBitmap.Size / 0x1000 + 1);
+	ReservePages(0, memorySize / 0x1000 + 1);
 
 	for (size_t i = 0; i < mMapEntries; i++) {
 		auto* desc = (EFI_MEMORY_DESCRIPTOR*)((uint64_t)mMap + (i * mMapDescriptorSize));
-		if (desc->type != 7) { // not EfiConventionalMemory
-			ReservePages(desc->physicalAddress, desc->numberOfPages);
+		if (desc->type == 7) { // EfiConventionalMemory
+			UnReservePages(desc->physicalAddress, desc->numberOfPages);
 		}
 	}
+	ReservePages(0, 0x100000 / 0x1000); // Reserve between 0 and 0x100000
+	LockPages(PageBitmap.Buffer, PageBitmap.Size / 0x1000 + 1);
 }
 void PageFrameAllocator::InitBitmap(size_t bitmapSize, void* bufferAddress) {
 	PageBitmap.Size = bitmapSize;

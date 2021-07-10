@@ -58,16 +58,16 @@ link:
 
 buildimg: kernel bootloader
 	@dd if=/dev/zero of=$(BUILDDIR)/$(OSNAME).img bs=512 count=93750
-	@mformat -i $(BUILDDIR)/$(OSNAME).img -f 1440 ::
+	@mformat -v $(OSNAME) -i $(BUILDDIR)/$(OSNAME).img -f 1440 ::
 	@mmd -i $(BUILDDIR)/$(OSNAME).img ::/EFI
 	@mmd -i $(BUILDDIR)/$(OSNAME).img ::/EFI/BOOT
-	@mcopy -i $(BUILDDIR)/$(OSNAME).img $(BOOTEFI) ::/EFI/BOOT
+	@mcopy -i $(BUILDDIR)/$(OSNAME).img $(BOOTEFI) ::/EFI/BOOT/BOOTX64.EFI
 	@mcopy -i $(BUILDDIR)/$(OSNAME).img startup.nsh ::
 	@mcopy -i $(BUILDDIR)/$(OSNAME).img $(BUILDDIR)/$(KERNEL) ::
 	@mcopy -i $(BUILDDIR)/$(OSNAME).img $(BUILDDIR)/zap-light16.psf ::
 
 run: buildimg
-	@$(EMU) -s -drive file=$(BUILDDIR)/$(OSNAME).img -m 256M -cpu qemu64 -drive if=pflash,format=raw,unit=0,file="$(OVMFDIR)/OVMF_CODE-pure-efi.fd",readonly=on -drive if=pflash,format=raw,unit=1,file="$(OVMFDIR)/OVMF_VARS-pure-efi.fd" -net none
+	@$(EMU) -s -drive file=$(BUILDDIR)/$(OSNAME).img -m 256M -cpu qemu64 -bios "$(OVMFDIR)/OVMF-pure-efi.fd" -net none
 
 .PHONY: clean
 clean:
