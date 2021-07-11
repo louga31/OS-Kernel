@@ -1,6 +1,6 @@
-#include "types.h"
-#include "cstr.h"
 #include "pci.h"
+#include <types.h>
+#include <cstr.h>
 
 namespace PCI {
 	const char* DeviceClasses[] {

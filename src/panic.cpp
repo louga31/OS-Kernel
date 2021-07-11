@@ -1,5 +1,5 @@
 #include "panic.h"
-#include "BasicRenderer.h"
+#include <BasicRenderer.h>
 
 void Panic(const char* message) {
 	Renderer.Clear(Colors::BLUE);

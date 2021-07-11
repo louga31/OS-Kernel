@@ -1,8 +1,7 @@
 #include "pci.h"
 
-#include "cstr.h"
-#include "BasicRenderer.h"
-#include "Paging/PageTableManager.h"
+#include <BasicRenderer.h>
+#include <memory/Paging/PageTableManager.h>
 
 namespace PCI {
 	void EnumerateFunction(uint64_t deviceAddress, uint64_t function) {

@@ -1,6 +1,6 @@
 #pragma once
 
-#include "types.h"
+#include <types.h>
 
 struct PSF1_HEADER {
 	byte magic[2];

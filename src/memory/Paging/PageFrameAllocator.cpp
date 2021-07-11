@@ -32,7 +32,7 @@ void PageFrameAllocator::ReadEFIMemoryMap(EFI_MEMORY_DESCRIPTOR* mMap, size_t mM
 
 	InitBitmap(bitmapSize, largestFreeMemSeg);
 
-	ReservePages(0, memorySize / 0x1000 + 1);
+	ReservePages(0, memorySize / 0x1000);
 
 	for (size_t i = 0; i < mMapEntries; i++) {
 		auto* desc = (EFI_MEMORY_DESCRIPTOR*)((uint64_t)mMap + (i * mMapDescriptorSize));

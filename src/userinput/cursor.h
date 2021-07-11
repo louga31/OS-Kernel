@@ -1,6 +1,6 @@
 #pragma once
 
-#include "../types.h"
+#include <types.h>
 
 #define CURSOR_HEIGHT 16
 #define CURSOR_WIDTH 16

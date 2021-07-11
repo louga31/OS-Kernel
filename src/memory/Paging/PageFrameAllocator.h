@@ -1,9 +1,9 @@
 #pragma once
 
-#include "../types.h"
-#include "../efiMemory.h"
-#include "../Bitmap.h"
-#include "../memutils.h"
+#include <types.h>
+#include <Bitmap.h>
+#include <memory/efiMemory.h>
+#include <memory/memutils.h>
 
 class PageFrameAllocator
 {

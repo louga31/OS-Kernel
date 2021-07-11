@@ -1,8 +1,8 @@
 #include "interrupts.h"
-#include "../panic.h"
-#include "../IO.h"
-#include "../userinput/keyboard.h"
-#include "../userinput/mouse.h"
+#include <panic.h>
+#include <userinput/IO.h>
+#include <userinput/keyboard.h>
+#include <userinput/mouse.h>
 
 __attribute__((interrupt)) void PageFault_Handler(interrupt_frame* frame) {
 	Panic("Page fault Detected");

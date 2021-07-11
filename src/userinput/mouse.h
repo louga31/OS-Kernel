@@ -1,7 +1,7 @@
 #pragma once
 
-#include "../types.h"
-#include "../math.h"
+#include <types.h>
+#include <math.h>
 
 #define LeftButton 0b00000001
 #define RightButton 0b00000010

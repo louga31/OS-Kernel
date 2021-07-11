@@ -1,12 +1,12 @@
 #pragma once
 
-#include "Framebuffer.h"
-#include "SimpleFont.h"
-#include "efiMemory.h"
-#include "acpi.h"
-#include "BasicRenderer.h"
-#include "Paging/PageTableManager.h"
-#include "interrupts/IDT.h"
+#include <Framebuffer.h>
+#include <SimpleFont.h>
+#include <BasicRenderer.h>
+#include <PCI/acpi.h>
+#include <memory/efiMemory.h>
+#include <memory/Paging/PageTableManager.h>
+#include <interrupts/IDT.h>
 
 struct BootInfo {
 	Framebuffer* framebuffer;

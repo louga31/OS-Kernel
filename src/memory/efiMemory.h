@@ -1,6 +1,6 @@
 #pragma once
 
-#include "types.h"
+#include <types.h>
 
 struct EFI_MEMORY_DESCRIPTOR {
     uint32_t type;            // Field size is 32 bits followed by 32 bit pad

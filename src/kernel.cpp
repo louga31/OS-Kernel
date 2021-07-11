@@ -1,8 +1,8 @@
 #include "kernelutils.h"
 
-#include "cstr.h"
-#include "Paging/PageFrameAllocator.h"
-#include "userinput/mouse.h"
+#include <cstr.h>
+#include <memory/Paging/PageFrameAllocator.h>
+#include <memory/heap.h>
 
 extern "C" [[noreturn]] void _start(BootInfo* bootInfo) {
 	KernelInfos kernelInfos = InitializeKernel(bootInfo);
@@ -20,6 +20,14 @@ extern "C" [[noreturn]] void _start(BootInfo* bootInfo) {
 	Renderer.Print("Reserved Memory: ");
 	Renderer.Print(to_string(PageFrameAllocator::GetReservedRAM() / 1024), Colors::MAGENTA);
 	Renderer.Print(" KB\n", Colors::MAGENTA);
+
+	Renderer.Println(to_hstring((uint64_t)malloc(0x8000)));
+	void* address = malloc(0x8000);
+	Renderer.Println(to_hstring((uint64_t)address));
+	Renderer.Println(to_hstring((uint64_t)malloc(0x100)));
+	free(address);
+
+	Renderer.Println(to_hstring((uint64_t)malloc(0x100)));
 
 	while(true);
 }

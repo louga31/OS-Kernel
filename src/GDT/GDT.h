@@ -1,6 +1,6 @@
 #pragma once
 
-#include "../types.h"
+#include <types.h>
 
 struct GDTDescriptor {
 	uint16_t Size;

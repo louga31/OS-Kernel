@@ -1,9 +1,9 @@
 #pragma once
 
-#include "math.h"
-#include "Framebuffer.h"
-#include "SimpleFont.h"
-#include "userinput/cursor.h"
+#include <math.h>
+#include <Framebuffer.h>
+#include <SimpleFont.h>
+#include <userinput/cursor.h>
 
 enum Colors {
 	BLACK       = 0xFF000000,

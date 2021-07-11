@@ -1,6 +1,7 @@
 #include "mouse.h"
-#include "../IO.h"
-#include "../BasicRenderer.h"
+
+#include <BasicRenderer.h>
+#include "IO.h"
 
 void MouseWait() {
 	uint64_t timeout = 100000;

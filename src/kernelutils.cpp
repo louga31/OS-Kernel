@@ -1,10 +1,11 @@
 #include "kernelutils.h"
-#include "IO.h"
-#include "pci.h"
-#include "GDT/GDT.h"
-#include "Paging/PageFrameAllocator.h"
-#include "interrupts/interrupts.h"
-#include "userinput/mouse.h"
+#include <userinput/IO.h>
+#include <PCI/pci.h>
+#include <GDT/GDT.h>
+#include <memory/heap.h>
+#include <memory/Paging/PageFrameAllocator.h>
+#include <interrupts/interrupts.h>
+#include <userinput/mouse.h>
 
 PageTableManager pageTableManager;
 void PrepareMemory(BootInfo* bootInfo) {
@@ -72,19 +73,23 @@ KernelInfos InitializeKernel(BootInfo* bootInfo) {
 	LoadGDT(&gdtDescriptor);
 
 	KernelInfos kernelInfos; // NOLINT(cppcoreguidelines-pro-type-member-init)
+
 	PrepareMemory(bootInfo);
+	InitializeHeap((void*)0x0000100000000000, 0x10);
+
 	CreateRenderer(bootInfo);
 
 	PrepareInterrupts();
 
 	InitPS2Mouse();
 
-	Renderer.Clear(); // Clear Screen
-	PrepareACPI(bootInfo);
-
 	outb(PIC1_DATA, 0b11111001);
 	outb(PIC2_DATA, 0b11101111);
 	asm ("sti"); // Re-enable the interrupts
+
+	Renderer.Clear(); // Clear Screen
+	PrepareACPI(bootInfo);
+
 	//Renderer.Clear(); // Clear Screen
 
 	return kernelInfos;
