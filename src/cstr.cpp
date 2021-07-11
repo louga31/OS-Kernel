@@ -62,7 +62,7 @@ const char* to_hstring(uint64_t value) {
     uint8_t* ptr;
     uint8_t tmp;
     uint8_t size = 8 * 2 - 1 + 2;
-    for (uint8_t i = 0; i < size - 2; i++)
+    for (uint8_t i = 0; i < size / 2; i++)
     {
         ptr = ((uint8_t*) valPtr + i);
         tmp = ((*ptr & 0xF0) >> 4);
@@ -81,7 +81,7 @@ const char* to_hstring(uint32_t value) {
     uint8_t* ptr;
     uint8_t tmp;
     uint8_t size = 4 * 2 - 1 + 2;
-    for (uint8_t i = 0; i < size - 2; i++)
+    for (uint8_t i = 0; i < size / 2; i++)
     {
         ptr = ((uint8_t*) valPtr + i);
         tmp = ((*ptr & 0xF0) >> 4);
@@ -100,7 +100,7 @@ const char* to_hstring(uint16_t value) {
     uint8_t* ptr;
     uint8_t tmp;
     uint8_t size = 2 * 2 - 1 + 2;
-    for (uint8_t i = 0; i < size - 2; i++)
+    for (uint8_t i = 0; i < size / 2; i++)
     {
         ptr = ((uint8_t*) valPtr + i);
         tmp = ((*ptr & 0xF0) >> 4);
@@ -119,7 +119,7 @@ const char* to_hstring(uint8_t value) {
     uint8_t* ptr;
     uint8_t tmp;
     uint8_t size = 1 * 2 - 1 + 2;
-    for (uint8_t i = 0; i < size - 2; i++)
+    for (uint8_t i = 0; i < size / 2; i++)
     {
         ptr = ((uint8_t*) valPtr + i);
         tmp = ((*ptr & 0xF0) >> 4);

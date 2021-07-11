@@ -47,24 +47,26 @@ bool MousePacketReady = false;
 Point64 MousePosition;
 Point64 OldMousePosition;
 void HandlePS2Mouse(uint8_t data) {
+	static bool skip = true;
+
+	ProcessMousePacket();
+	if (skip) {
+		skip = false;
+		return;
+	}
+
 	switch (MouseCycle) {
 		case 0:
-			if (MousePacketReady)
-				break;
 			if ((data & 0b00001000) == 0) // We are not in sync with the mouse
 				break;
 			MousePacket[0] = data;
 			MouseCycle++;
 			break;
 		case 1:
-			if (MousePacketReady)
-				break;
 			MousePacket[1] = data;
 			MouseCycle++;
 			break;
 		case 2:
-			if (MousePacketReady)
-				break;
 			MousePacket[2] = data;
 			MousePacketReady = true;
 			MouseCycle = 0;
@@ -119,13 +121,13 @@ void ProcessMousePacket() {
 	Renderer.DrawOverlayMouseCursor(MousePosition);
 
 	if (MousePacket[0] & LeftButton) {
-		PrintColor = Colors::RED;
+
 	}
 	if (MousePacket[0] & RightButton) {
-		PrintColor = Colors::BLUE;
+
 	}
 	if (MousePacket[0] & MiddleButton) {
-		PrintColor = Colors::GREEN;
+
 	}
 
 	drawn = true;

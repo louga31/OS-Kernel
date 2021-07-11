@@ -1,12 +1,13 @@
 #include "kernelutils.h"
 #include "IO.h"
+#include "pci.h"
 #include "GDT/GDT.h"
 #include "Paging/PageFrameAllocator.h"
 #include "interrupts/interrupts.h"
 #include "userinput/mouse.h"
 
 PageTableManager pageTableManager;
-void PrepareMemory(BootInfo* bootInfo, KernelInfos* kernelInfos) {
+void PrepareMemory(BootInfo* bootInfo) {
 	// Initialize the PageFrameAllocator
 	uint64_t mMapEntries = bootInfo->mMapSize / bootInfo->mMapDescriptorSize;
 	PageFrameAllocator::ReadEFIMemoryMap(bootInfo->mMap, bootInfo->mMapSize, bootInfo->mMapDescriptorSize);
@@ -18,21 +19,20 @@ void PrepareMemory(BootInfo* bootInfo, KernelInfos* kernelInfos) {
 
 	auto* PML4 = (PageTable*)PageFrameAllocator::RequestPage();
 	memset(PML4, 0, 0x1000);
-	pageTableManager = PageTableManager(PML4);
+	PageTableManager::PML4 = PML4;
 
 	for (uint64_t t = 0; t < GetMemorySize(bootInfo->mMap, mMapEntries, bootInfo->mMapDescriptorSize); t+= 0x1000) {
-		pageTableManager.MapMemory((void*)t, (void*)t);
+		PageTableManager::MapMemory((void*)t, (void*)t);
 	}
 
 	auto fbBase = (uint64_t)bootInfo->framebuffer->BaseAddress;
 	auto fbSize = (uint64_t)bootInfo->framebuffer->BufferSize + 0x1000;
 	PageFrameAllocator::LockPages((void*)fbBase, fbSize / 0x1000 + 1);
 	for (uint64_t t = fbBase; t < fbBase + fbSize; t += 0x1000) {
-		pageTableManager.MapMemory((void*)t, (void*)t);
+		PageTableManager::MapMemory((void*)t, (void*)t);
 	}
 
 	asm("mov %0, %%cr3" : : "r" (PML4));
-	kernelInfos->pageTableManager = &pageTableManager;
 }
 void CreateRenderer(BootInfo* bootInfo) {
 	// Create the text renderer
@@ -59,6 +59,12 @@ void PrepareInterrupts() {
 
 	RemapPIC();
 }
+void PrepareACPI(BootInfo* bootInfo) {
+	auto* xsdt = (ACPI::SDTHeader*)(bootInfo->rsdp->XSDTAddress);
+	auto mcfg = (ACPI::MCFGHeader*)ACPI::FindTable(xsdt, (char*)"MCFG");
+
+	PCI::EnumeratePCI(mcfg);
+}
 KernelInfos InitializeKernel(BootInfo* bootInfo) {
 	GDTDescriptor gdtDescriptor; // NOLINT(cppcoreguidelines-pro-type-member-init)
 	gdtDescriptor.Size = sizeof(GDT) - 1;
@@ -66,17 +72,20 @@ KernelInfos InitializeKernel(BootInfo* bootInfo) {
 	LoadGDT(&gdtDescriptor);
 
 	KernelInfos kernelInfos; // NOLINT(cppcoreguidelines-pro-type-member-init)
-	PrepareMemory(bootInfo, &kernelInfos);
+	PrepareMemory(bootInfo);
 	CreateRenderer(bootInfo);
 
 	PrepareInterrupts();
 
 	InitPS2Mouse();
 
+	Renderer.Clear(); // Clear Screen
+	PrepareACPI(bootInfo);
+
 	outb(PIC1_DATA, 0b11111001);
 	outb(PIC2_DATA, 0b11101111);
 	asm ("sti"); // Re-enable the interrupts
+	//Renderer.Clear(); // Clear Screen
 
-	Renderer.Clear(); // Clear Screen
 	return kernelInfos;
 }

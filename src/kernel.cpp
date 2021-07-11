@@ -6,7 +6,6 @@
 
 extern "C" [[noreturn]] void _start(BootInfo* bootInfo) {
 	KernelInfos kernelInfos = InitializeKernel(bootInfo);
-	PageTableManager* pageTableManager = kernelInfos.pageTableManager;
 
 	Renderer.Println("Kernel Initialized Successfully", Colors::GREEN);
 
@@ -21,10 +20,6 @@ extern "C" [[noreturn]] void _start(BootInfo* bootInfo) {
 	Renderer.Print("Reserved Memory: ");
 	Renderer.Print(to_string(PageFrameAllocator::GetReservedRAM() / 1024), Colors::MAGENTA);
 	Renderer.Print(" KB\n", Colors::MAGENTA);
-
-	while (true) {
-		ProcessMousePacket();
-	}
 
 	while(true);
 }

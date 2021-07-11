@@ -4,10 +4,7 @@
 
 class PageTableManager {
 public:
-	PageTable* PML4;
+	inline static PageTable* PML4 = nullptr;
 
-	PageTableManager() {}; // Do not use
-	PageTableManager(PageTable* PML4Address) : PML4(PML4Address) {};
-
-	void MapMemory(void* virtualMemory, void* physicalMemory);
+	static void MapMemory(void* virtualMemory, void* physicalMemory);
 };

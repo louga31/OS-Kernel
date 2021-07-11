@@ -67,7 +67,7 @@ buildimg: kernel bootloader
 	@mcopy -i $(BUILDDIR)/$(OSNAME).img $(BUILDDIR)/zap-light16.psf ::
 
 run: buildimg
-	@$(EMU) -s -drive file=$(BUILDDIR)/$(OSNAME).img -m 256M -cpu qemu64 -bios "$(OVMFDIR)/OVMF-pure-efi.fd" -net none
+	@$(EMU) -machine q35 -s -drive file=$(BUILDDIR)/$(OSNAME).img -m 256M -cpu qemu64 -bios "$(OVMFDIR)/OVMF-pure-efi.fd" -net none
 
 .PHONY: clean
 clean:

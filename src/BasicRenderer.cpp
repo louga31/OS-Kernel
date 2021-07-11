@@ -93,7 +93,8 @@ void BasicRenderer::Print(const char* str, uint32_t color, bool haveBackground) 
 }
 void BasicRenderer::Println(const char* str, uint32_t color, bool haveBackground) {
     Print(str, color, haveBackground);
-    Print("\n");
+	CursorPosition.x = CursorLimits.x;
+	CursorPosition.y += 16;
 }
 void BasicRenderer::Clear(uint32_t color) {
 	uint64_t fbBase = (uint64_t)framebuffer->BaseAddress;
@@ -124,7 +125,7 @@ void BasicRenderer::ClearMouseCursor(Point64 position) {
 			uint8_t bit = x + y * CURSOR_HEIGHT;
 			uint8_t byte = bit / 8;
 			if ((cursor[byte] & (0b10000000) >> (x % 8))) {
-				if (GetPx(position.x +x, position.y + y) == MouseCursorBufferAfter[x + y * CURSOR_HEIGHT]) {
+				if (GetPx(position.x + x, position.y + y) == MouseCursorBufferAfter[x + y * CURSOR_HEIGHT]) {
 					PutPx(position.x + x, position.y + y, MouseCursorBuffer[x + y * CURSOR_HEIGHT]);
 				}
 			}

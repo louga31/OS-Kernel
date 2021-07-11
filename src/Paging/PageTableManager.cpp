@@ -2,8 +2,6 @@
 
 #include "PageMapIndexer.h"
 #include "PageFrameAllocator.h"
-#include "../types.h"
-#include "../memutils.h"
 
 void PageTableManager::MapMemory(void* virtualMemory, void* physicalMemory) {
 	PageMapIndexer indexer = PageMapIndexer((uint64_t)virtualMemory);

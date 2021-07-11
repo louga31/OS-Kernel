@@ -26,4 +26,4 @@ add_executable(src
         memutils.cpp
         memutils.h
         SimpleFont.h
-        types.h Paging/PageTableManager.cpp Paging/PageTableManager.h Paging/paging.cpp kernelutils.h kernelutils.cpp GDT/GDT.cpp GDT/GDT.h interrupts/IDT.cpp interrupts/IDT.h interrupts/interrupts.cpp interrupts/interrupts.h panic.cpp panic.h IO.cpp IO.h userinput/kbScancodeTranslation.cpp userinput/kbScancodeTranslation.h userinput/keyboard.cpp userinput/keyboard.h userinput/mouse.cpp userinput/mouse.h userinput/cursor.h)
+        types.h Paging/PageTableManager.cpp Paging/PageTableManager.h Paging/paging.cpp kernelutils.h kernelutils.cpp GDT/GDT.cpp GDT/GDT.h interrupts/IDT.cpp interrupts/IDT.h interrupts/interrupts.cpp interrupts/interrupts.h panic.cpp panic.h IO.cpp IO.h userinput/kbScancodeTranslation.cpp userinput/kbScancodeTranslation.h userinput/keyboard.cpp userinput/keyboard.h userinput/mouse.cpp userinput/mouse.h userinput/cursor.h acpi.h acpi.cpp pci.cpp pci.h pciDescriptors.cpp)
