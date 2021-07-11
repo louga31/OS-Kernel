@@ -13,7 +13,7 @@ LD = ld.lld
 EMU=qemu-system-x86_64
 DEBUG=gdb
 
-CFLAGS = -ffreestanding -fshort-wchar -g -std=c++17 -MD -mno-red-zone
+CFLAGS = -ffreestanding -fshort-wchar -g -std=c++17 -MD -mno-red-zone -I $(SRCDIR)
 ASMFLAGS =
 LDFLAGS = -T $(LDS) -static -Bsymbolic -nostdlib
 
