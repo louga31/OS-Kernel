@@ -84,7 +84,7 @@ void BasicRenderer::Print(const char* str, uint32_t color, bool haveBackground) 
         CursorPosition.x += 8;
         if (CursorPosition.x + 8 > framebuffer->Width)
         {
-            CursorPosition.x = 0;
+            CursorPosition.x = CursorLimits.x;
             CursorPosition.y += 16;
         }
         

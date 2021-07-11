@@ -1,11 +1,12 @@
 #include "kernelutils.h"
-#include <userinput/IO.h>
+#include <IO.h>
 #include <PCI/pci.h>
 #include <GDT/GDT.h>
 #include <memory/heap.h>
 #include <memory/Paging/PageFrameAllocator.h>
 #include <interrupts/interrupts.h>
 #include <userinput/mouse.h>
+#include <scheduling/pit/pit.h>
 
 PageTableManager pageTableManager;
 void PrepareMemory(BootInfo* bootInfo) {
@@ -55,6 +56,7 @@ void PrepareInterrupts() {
 	SetIDTGate((void*)GeneralProtectionFault_Handler, 0xD, IDT_TA_InterruptGate, 0x08);
 	SetIDTGate((void*)KeyboardInt_Handler, 0x21, IDT_TA_InterruptGate, 0x08);
 	SetIDTGate((void*)MouseInt_Handler, 0x2C, IDT_TA_InterruptGate, 0x08);
+	SetIDTGate((void*)PITInt_Handler, 0x20, IDT_TA_InterruptGate, 0x08);
 
 	asm("lidt %0" : : "m" (idtr));
 
@@ -83,9 +85,11 @@ KernelInfos InitializeKernel(BootInfo* bootInfo) {
 
 	InitPS2Mouse();
 
-	outb(PIC1_DATA, 0b11111001);
+	outb(PIC1_DATA, 0b11111000);
 	outb(PIC2_DATA, 0b11101111);
 	asm ("sti"); // Re-enable the interrupts
+
+	PIT::SetFrequency(1000);
 
 	Renderer.Clear(); // Clear Screen
 	PrepareACPI(bootInfo);

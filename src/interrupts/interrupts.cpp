@@ -1,8 +1,9 @@
 #include "interrupts.h"
 #include <panic.h>
-#include <userinput/IO.h>
+#include <IO.h>
 #include <userinput/keyboard.h>
 #include <userinput/mouse.h>
+#include <scheduling/pit/pit.h>
 
 __attribute__((interrupt)) void PageFault_Handler(interrupt_frame* frame) {
 	Panic("Page fault Detected");
@@ -26,6 +27,11 @@ __attribute__((interrupt)) void MouseInt_Handler(struct interrupt_frame* frame) 
 	HandlePS2Mouse(data);
 	PIC_EndSlave();
 }
+__attribute__((interrupt)) void PITInt_Handler(struct interrupt_frame* frame) {
+	PIT::Tick();
+	PIC_EndMaster();
+}
+
 void PIC_EndMaster() {
 	outb(PIC1_COMMAND, PIC_EOI);
 }

@@ -1,8 +1,9 @@
 #include "kernelutils.h"
 
 #include <cstr.h>
-#include <memory/Paging/PageFrameAllocator.h>
 #include <memory/heap.h>
+#include <memory/Paging/PageFrameAllocator.h>
+#include <scheduling/pit/pit.h>
 
 extern "C" [[noreturn]] void _start(BootInfo* bootInfo) {
 	KernelInfos kernelInfos = InitializeKernel(bootInfo);
@@ -28,6 +29,12 @@ extern "C" [[noreturn]] void _start(BootInfo* bootInfo) {
 	free(address);
 
 	Renderer.Println(to_hstring((uint64_t)malloc(0x100)));
+
+	for (uint64_t t = 0; t < 600; ++t) {
+		Renderer.Print(to_string(t));
+		Renderer.Print(" ");
+		PIT::Sleep(10);
+	}
 
 	while(true);
 }
