@@ -1,3 +1,4 @@
+#include <memory/Paging/PageFrameAllocator.h>
 #include "memutils.h"
 
 size_t GetMemorySize(EFI_MEMORY_DESCRIPTOR* mMap, size_t mMapEntries, size_t mMapDescriptorSize) {
@@ -12,6 +13,17 @@ size_t GetMemorySize(EFI_MEMORY_DESCRIPTOR* mMap, size_t mMapEntries, size_t mMa
 	}
 	
 	return memorySizeBytes;
+}
+void* AllocateBuffer(size_t size) {
+	if (size == 0)
+		return nullptr;
+	if (size % 0x1000 > 0) { // It is not a multiple of 0x1000 (4096)
+		size -= (size % 0x1000);
+		size += 0x1000;
+	}
+	uint64_t pageCount = size / 0x1000;
+
+	return PageFrameAllocator::RequestPages(pageCount);
 }
 int memcmp(const void* aptr, const void* bptr, size_t n) {
 	const byte* a = (byte*)aptr;

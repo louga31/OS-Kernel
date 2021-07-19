@@ -5,28 +5,6 @@ BasicRenderer Renderer;
 uint32_t ClearColor = Colors::BLACK;
 uint32_t PrintColor = Colors::WHITE;
 
-void BasicRenderer::SetCursorPosition(uint32_t x, uint32_t y) {
-	CursorPosition.x = x;
-	CursorPosition.y = y;
-}
-void BasicRenderer::SetCursorLimits(uint32_t x, uint32_t y) {
-	CursorLimits.x = x;
-	CursorLimits.y = y;
-}
-void BasicRenderer::PutPx(uint32_t x, uint32_t y, uint32_t color) {
-	*(uint32_t*)((uint32_t*)framebuffer->BaseAddress + x + (y * framebuffer->PixelsPerScanLine)) = color;
-}
-uint32_t BasicRenderer::GetPx(uint32_t x, uint32_t y) {
-	return *(uint32_t*)((uint32_t*)framebuffer->BaseAddress + x + (y * framebuffer->PixelsPerScanLine));
-}
-void BasicRenderer::PutChar(char chr, uint32_t color, bool haveBackground) {
-	PutChar(chr, CursorPosition.x, CursorPosition.y);
-	CursorPosition.x += 8;
-	if (CursorPosition.x + 8 > framebuffer->Width){
-		CursorPosition.x = 0;
-		CursorPosition.y += 16;
-	}
-}
 void BasicRenderer::PutChar(char chr, uint32_t xOff, uint32_t yOff, uint32_t color, bool haveBackground) {
     auto* pixPtr = (uint32_t*)framebuffer->BaseAddress;
     char* fontPtr = (char*)psf1_font->glyphBuffer + (chr * psf1_font->psf1_Header->charsize);
@@ -74,18 +52,22 @@ void BasicRenderer::Print(const char* str, uint32_t color, bool haveBackground) 
     while (*chr != 0)
     {
         if (*chr == '\n') {
-            CursorPosition.x = CursorLimits.x;
-            CursorPosition.y += 16;
+	        NextLine();
             chr++;
             continue;
         }
+
+	    if (*chr == '\t') {
+		    CursorPosition.x += 8 * 4;
+		    chr++;
+		    continue;
+	    }
         
         PutChar(*chr, CursorPosition.x, CursorPosition.y, color, haveBackground);
         CursorPosition.x += 8;
         if (CursorPosition.x + 8 > framebuffer->Width)
         {
-            CursorPosition.x = CursorLimits.x;
-            CursorPosition.y += 16;
+	        NextLine();
         }
         
         chr++;
@@ -93,8 +75,7 @@ void BasicRenderer::Print(const char* str, uint32_t color, bool haveBackground) 
 }
 void BasicRenderer::Println(const char* str, uint32_t color, bool haveBackground) {
     Print(str, color, haveBackground);
-	CursorPosition.x = CursorLimits.x;
-	CursorPosition.y += 16;
+	NextLine();
 }
 void BasicRenderer::Clear(uint32_t color) {
 	uint64_t fbBase = (uint64_t)framebuffer->BaseAddress;

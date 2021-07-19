@@ -1,9 +1,17 @@
 #pragma once
 
 #include <types.h>
+#include <ahci/ahci.h>
 #include "acpi.h"
 
+namespace AHCI {
+	class AHCIDriver;
+}
+
 namespace PCI {
+	extern AHCI::AHCIDriver* AHCIDrivers[10]; // TODO: Remove the limit
+	extern uint8_t AHCIDriverNumber;
+
 	struct PCIDeviceHeader {
 		uint16_t VendorID;
 		uint16_t DeviceID;
@@ -19,11 +27,34 @@ namespace PCI {
 		uint8_t BIST;
 	} __attribute__((packed));
 
+	struct PCIHeader0 {
+		PCIDeviceHeader Header;
+		uint32_t BAR0;
+		uint32_t BAR1;
+		uint32_t BAR2;
+		uint32_t BAR3;
+		uint32_t BAR4;
+		uint32_t BAR5;
+		uint32_t CardbusCISPtr;
+		uint16_t SubsystemVendorID;
+		uint16_t SubsystemID;
+		uint32_t ExpansionROMBaseAddr;
+		uint8_t CapabilitiesPtr;
+		uint8_t Reserved0;
+		uint16_t Reserved1;
+		uint32_t Reserved2;
+		uint8_t InterruptLine;
+		uint8_t InterruptPin;
+		uint8_t MinGrant;
+		uint8_t MaxLatency;
+	};
+
 	void EnumeratePCI(ACPI::MCFGHeader* mcfg);
 
 	extern const char* DeviceClasses[];
 	const char* GetVendorName(uint16_t vendorID);
 	const char* GetDeviceName(uint16_t vendorID, uint16_t deviceID);
+	const char* GetClassName(uint8_t classCode);
 	const char* GetSubclassName(uint8_t classCode, uint8_t subclassCode);
 	const char* GetProgIFName(uint8_t classCode, uint8_t subclassCode, uint8_t progIF);
 }

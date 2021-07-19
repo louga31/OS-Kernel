@@ -15,6 +15,8 @@ void HeapSegHdr::CombineForward() {
 		next->next->previous = this;
 
 	length = length + next->length + sizeof(HeapSegHdr);
+
+	next = next->next;
 }
 void HeapSegHdr::CombineBackward() {
 	if (previous != nullptr && previous->free)
@@ -111,8 +113,23 @@ void* malloc(size_t size) {
 	return malloc(size);
 }
 void free(void* address) {
-	auto* segment = (HeapSegHdr*)address - 1;
+	auto* segment = (HeapSegHdr*)((uint64_t)address - sizeof(HeapSegHdr));
 	segment->free = true;
+	memset((void*)((uint64_t)segment + sizeof(HeapSegHdr)), 0x00, segment->length);
 	segment->CombineForward();
 	segment->CombineBackward();
+}
+
+void* operator new(size_t size) {
+	return malloc(size);
+}
+void* operator new[](size_t size) {
+	return malloc(size);
+}
+
+void operator delete(void* p) noexcept {
+	free(p);
+}
+void operator delete[](void* p) noexcept {
+	free(p);
 }

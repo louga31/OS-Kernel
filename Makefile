@@ -13,7 +13,7 @@ LD = ld.lld
 EMU=qemu-system-x86_64
 DEBUG=gdb
 
-CFLAGS = -ffreestanding -fshort-wchar -g -std=c++17 -MD -mno-red-zone -I $(SRCDIR)
+CFLAGS = -ffreestanding -fshort-wchar -fno-exceptions -g -std=c++17 -MD -mno-red-zone -fno-threadsafe-statics -I $(SRCDIR)
 ASMFLAGS =
 LDFLAGS = -T $(LDS) -static -Bsymbolic -nostdlib
 
@@ -58,7 +58,7 @@ link:
 
 buildimg: kernel bootloader
 	@dd if=/dev/zero of=$(BUILDDIR)/$(OSNAME).img bs=512 count=93750
-	@mformat -v $(OSNAME) -i $(BUILDDIR)/$(OSNAME).img -f 1440 ::
+	@mformat -v $(OSNAME) -i $(BUILDDIR)/$(OSNAME).img -F ::
 	@mmd -i $(BUILDDIR)/$(OSNAME).img ::/EFI
 	@mmd -i $(BUILDDIR)/$(OSNAME).img ::/EFI/BOOT
 	@mcopy -i $(BUILDDIR)/$(OSNAME).img $(BOOTEFI) ::/EFI/BOOT/BOOTX64.EFI

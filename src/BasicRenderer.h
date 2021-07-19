@@ -57,15 +57,35 @@ public:
 	BasicRenderer() {}; // Do not use
     BasicRenderer(Framebuffer* framebuffer, PSF1_FONT* psf1_font) : framebuffer(framebuffer), psf1_font(psf1_font), dimensions(framebuffer->PixelsPerScanLine, framebuffer->Height) {};
 
-    void SetCursorPosition(uint32_t x, uint32_t y);
-    void SetCursorLimits(uint32_t x, uint32_t y);
+	inline void SetCursorPosition(uint32_t x, uint32_t y) {
+		CursorPosition.x = x;
+		CursorPosition.y = y;
+	}
+	inline void SetCursorLimits(uint32_t x, uint32_t y) {
+		CursorLimits.x = x;
+		CursorLimits.y = y;
+	}
 
-    void PutPx(uint32_t x, uint32_t y, uint32_t color);
-	uint32_t GetPx(uint32_t x, uint32_t y);
+	inline void PutPx(uint32_t x, uint32_t y, uint32_t color) {
+		*(uint32_t*)((uint32_t*)framebuffer->BaseAddress + x + (y * framebuffer->PixelsPerScanLine)) = color;
+	}
+	inline uint32_t GetPx(uint32_t x, uint32_t y) {
+		return *(uint32_t*)((uint32_t*)framebuffer->BaseAddress + x + (y * framebuffer->PixelsPerScanLine));
+	}
 
-    void PutChar(char chr, uint32_t color = PrintColor, bool haveBackground = false);
-    void PutChar(char chr, uint32_t xOff, uint32_t yOff, uint32_t color = PrintColor, bool haveBackground = false);
-    void ClearChar(uint32_t color = ClearColor);
+    inline void NextLine() {
+	    CursorPosition.x = CursorLimits.x;
+	    CursorPosition.y += 16;
+    }
+	inline void PutChar(char chr, uint32_t color = PrintColor, bool haveBackground = false) {
+		PutChar(chr, CursorPosition.x, CursorPosition.y);
+		CursorPosition.x += 8;
+		if (CursorPosition.x + 8 > framebuffer->Width){
+			NextLine();
+		}
+	}
+	void PutChar(char chr, uint32_t xOff, uint32_t yOff, uint32_t color = PrintColor, bool haveBackground = false);
+	void ClearChar(uint32_t color = ClearColor);
 
     void Print(const char* str, uint32_t color = PrintColor, bool haveBackground = false);
     void Println(const char* str, uint32_t color = PrintColor, bool haveBackground = false);

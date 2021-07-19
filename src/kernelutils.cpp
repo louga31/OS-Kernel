@@ -80,16 +80,25 @@ KernelInfos InitializeKernel(BootInfo* bootInfo) {
 	InitializeHeap((void*)0x0000100000000000, 0x10);
 
 	CreateRenderer(bootInfo);
+	Renderer.Clear(); // Clear Screen
 
+	Renderer.Print("Preparing interrupts...");
 	PrepareInterrupts();
+	Renderer.Println("Done", Colors::GREEN);
 
+	Renderer.Print("Initializing PS2 mouse...");
 	InitPS2Mouse();
+	Renderer.Println("Done", Colors::GREEN);
 
+	Renderer.Print("Initializing PIC...");
 	outb(PIC1_DATA, 0b11111000);
 	outb(PIC2_DATA, 0b11101111);
 	asm ("sti"); // Re-enable the interrupts
+	Renderer.Println("Done", Colors::GREEN);
 
+	Renderer.Print("Setting PIT frequency...");
 	PIT::SetFrequency(1000);
+	Renderer.Println("Done", Colors::GREEN);
 
 	Renderer.Clear(); // Clear Screen
 	PrepareACPI(bootInfo);

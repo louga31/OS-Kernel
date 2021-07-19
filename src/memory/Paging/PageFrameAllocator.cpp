@@ -120,6 +120,25 @@ void* PageFrameAllocator::RequestPage() {
 
 	return nullptr; // TODO: Page Frame Swap to File
 }
+void* PageFrameAllocator::RequestPages(uint64_t pageCount) {
+	for (; pageBitmapIndex < PageBitmap.Size * 8; ++pageBitmapIndex) {
+		bool skip = false;
+		for (int i = 0; i < pageCount; ++i) {
+			if (PageBitmap[pageBitmapIndex + i]){
+				skip = true;
+				continue;
+			}
+		}
+		if (skip)
+			continue;
+		for (int i = 0; i < pageCount; ++i) {
+			LockPage((void*)((pageBitmapIndex + i) * 0x1000));
+		}
+		return (void*)(pageBitmapIndex * 0x1000);
+	}
+
+	return nullptr; // TODO: Page Frame Swap to File
+}
 uint64_t PageFrameAllocator::GetFreeRAM() {
 	return freeMemory;
 }

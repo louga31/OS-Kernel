@@ -1,9 +1,10 @@
 #include "kernelutils.h"
 
 #include <cstr.h>
-#include <memory/heap.h>
 #include <memory/Paging/PageFrameAllocator.h>
 #include <scheduling/pit/pit.h>
+#include <ahci/ahci.h>
+#include <filesystem/fat.h>
 
 extern "C" [[noreturn]] void _start(BootInfo* bootInfo) {
 	KernelInfos kernelInfos = InitializeKernel(bootInfo);
@@ -22,19 +23,18 @@ extern "C" [[noreturn]] void _start(BootInfo* bootInfo) {
 	Renderer.Print(to_string(PageFrameAllocator::GetReservedRAM() / 1024), Colors::MAGENTA);
 	Renderer.Print(" KB\n", Colors::MAGENTA);
 
-	Renderer.Println(to_hstring((uint64_t)malloc(0x8000)));
-	void* address = malloc(0x8000);
-	Renderer.Println(to_hstring((uint64_t)address));
-	Renderer.Println(to_hstring((uint64_t)malloc(0x100)));
-	free(address);
+	auto* buffer = (char*)PageFrameAllocator::RequestPage();
+	memset(buffer, 0, 0x1000);
+	AHCI::AHCIDriver* ahci = PCI::AHCIDrivers[0];
+	ahci->Read(0, 4, 0, buffer);
+	FAT::InitializeFAT((FAT::FATBootSector*)buffer);
 
-	Renderer.Println(to_hstring((uint64_t)malloc(0x100)));
-
-	for (uint64_t t = 0; t < 600; ++t) {
-		Renderer.Print(to_string(t));
-		Renderer.Print(" ");
-		PIT::Sleep(10);
+//	for (uint64_t t = 0; t < 600; ++t) {
+//		Renderer.Print(to_string(t));
+//		Renderer.Print(" ");
+//		PIT::Sleep(10);
+//	}
+	while(true) {
+		asm ("hlt");
 	}
-
-	while(true);
 }

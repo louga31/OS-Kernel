@@ -17,3 +17,9 @@ void ExpandHeap(size_t length);
 
 void* malloc(size_t size);
 void free(void* address);
+
+void* operator new(size_t size);
+void* operator new[](size_t size);
+
+void operator delete(void* p) noexcept;
+void operator delete[](void* p) noexcept;

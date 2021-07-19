@@ -1,9 +1,15 @@
 #include "pci.h"
 
 #include <BasicRenderer.h>
+#include <cstr.h>
+#include <ahci/ahci.h>
+#include <memory/heap.h>
 #include <memory/Paging/PageTableManager.h>
 
 namespace PCI {
+	AHCI::AHCIDriver* AHCIDrivers[10]; // TODO: Remove the limit
+	uint8_t AHCIDriverNumber = 0;
+
 	void EnumerateFunction(uint64_t deviceAddress, uint64_t function) {
 		uint64_t offset = function << 12;
 		uint64_t functionAddress = deviceAddress + offset;
@@ -21,11 +27,24 @@ namespace PCI {
 		Renderer.Print(" / ");
 		Renderer.Print(GetDeviceName(pciDeviceHeader->VendorID, pciDeviceHeader->DeviceID));
 		Renderer.Print(" / ");
-		Renderer.Print(DeviceClasses[pciDeviceHeader->Class]);
+		Renderer.Print(GetClassName(pciDeviceHeader->Class));
 		Renderer.Print(" / ");
 		Renderer.Print(GetSubclassName(pciDeviceHeader->Class, pciDeviceHeader->Subclass));
 		Renderer.Print(" / ");
 		Renderer.Println(GetProgIFName(pciDeviceHeader->Class, pciDeviceHeader->Subclass, pciDeviceHeader->ProgIF));
+
+		switch (pciDeviceHeader->Class) {
+			case 0x01: // Mass storage controller
+				switch (pciDeviceHeader->Subclass) {
+					case 0x06: // Serial ATA
+						switch (pciDeviceHeader->ProgIF) {
+							case 0x01: // AHCI 1.0 device
+								AHCIDrivers[AHCIDriverNumber] = new AHCI::AHCIDriver(pciDeviceHeader);
+								AHCIDriverNumber++;
+						}
+				}
+
+		}
 	}
 	void EnumerateDevice(uint64_t busAddress, uint64_t device) {
 		uint64_t offset = device << 15;
